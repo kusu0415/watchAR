@@ -1,0 +1,561 @@
+<DocumentType html>
+
+<html lang="en" class="js-focus-visible">
+
+<head>
+  <title>rannnagisa</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- <link rel="stylesheet" href="demo-styles.css"> -->
+
+  <!-- The following libraries and polyfills are recommended to maximize browser support -->
+  <!-- NOTE: you must adjust the paths as appropriate for your project -->
+
+
+  <!-- 🚨 REQUIRED: Web Components polyfill to support Edge and Firefox < 63 -->
+  <script src="https://unpkg.com/@webcomponents/webcomponentsjs@2.1.3/webcomponents-loader.js"></script>
+
+  <!-- 💁 OPTIONAL: Intersection Observer polyfill for better performance in Safari and IE11 -->
+  <script src="https://unpkg.com/intersection-observer@0.5.1/intersection-observer.js"></script>
+
+  <!-- 💁 OPTIONAL: Resize Observer polyfill improves resize behavior in non-Chrome browsers -->
+  <script src="https://unpkg.com/resize-observer-polyfill@1.5.0/dist/ResizeObserver.js"></script>
+
+  <!-- 💁 OPTIONAL: Fullscreen polyfill is needed to fully support AR features -->
+  <script src="https://unpkg.com/fullscreen-polyfill@1.0.2/dist/fullscreen.polyfill.js"></script>
+
+  <!-- 💁 OPTIONAL: Include prismatic.js for Magic Leap support -->
+  <script src="https://unpkg.com/@magicleap/prismatic/prismatic.min.js"></script>
+
+  <!-- 💁 OPTIONAL: The :focus-visible polyfill removes the focus ring for some input types -->
+  <script src="https://unpkg.com/focus-visible@5.0.2/dist/focus-visible.js" defer></script>
+
+  <!-- 💁 Include both scripts below to support all browsers! -->
+
+  <!-- Loads <model-viewer> for modern browsers: -->
+  <!-- <script type="module" src="https://unpkg.com/@google/model-viewer@1.6.0/dist/model-viewer.js"></script> -->
+  <script>
+    var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+    if (/windows phone/i.test(userAgent)) {
+      document.write('<script type="module" src="https://unpkg.com/@google/model-viewer@1.6.0/dist/model-viewer.js"><\/script>');
+    }
+    else if (/android/i.test(userAgent)) {
+      document.write('<script type="module" src="https://unpkg.com/@google/model-viewer@1.6.0/dist/model-viewer.js"><\/script>');
+    }
+    else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+      document.write('<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.js"><\/script>');
+    }
+    else{
+      document.write('<script type="module" src="https://unpkg.com/@google/model-viewer@1.11.1/dist/model-viewer.js"><\/script>');
+    }
+  </script>
+  <!-- Loads <model-viewer> for old browsers: -->
+  <script nomodule src="https://unpkg.com/@google/model-viewer/dist/model-viewer-legacy.js"></script>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+
+  <style>
+    body {
+      background-color: #528DD9;
+    }
+
+    model-viewer {
+      --poster-color: #77ABD9;
+    }
+
+    .arButton {
+      -ms-transform: translate(0%, 0%);
+      transform: translate(0%, 0%);
+      /* keep first line as is */
+      background-color: white;
+      /*ar*/
+      border-radius: 5px;
+      /*ar*/
+      border: none;
+      /*ar*/
+      border-color: black;
+      /*ar*/
+      position: absolute;
+      /*ar*/
+      /* top: 1rem;
+        right: 0.6rem; */
+      text-align: center;
+      /*ar*/
+      font-family: 'Verdana, Geneva, sans-serif';
+      /*ar*/
+      font-size: medium;
+      /*ar*/
+      font-weight: 500;
+      /*ar*/
+      color: #77ABD9;
+      /*ar*/
+      padding: 1rem;
+      /*ar*/
+      margin: 0;
+      /*ar*/
+      max-width: 31%;
+      /*ar*/
+      overflow-wrap: break-word;
+      /*ar*/
+    }
+
+    .redirectButton {
+      -ms-transform: translate(0%, 0%);
+      transform: translate(0%, 0%);
+      /* keep first line as is */
+      background-color: white;
+      /*redirect*/
+      border-radius: 5px;
+      /*redirect*/
+      border: none;
+      /*redirect*/
+      border-color: black;
+      /*redirect*/
+      position: absolute;
+      /*redirect*/
+      top: 1rem;
+      /*redirect*/
+      right: 0.6rem;
+      /*redirect*/
+      text-align: center;
+      /*redirect*/
+      font-family: 'Verdana, Geneva, sans-serif';
+      /*redirect*/
+      font-size: medium;
+      /*redirect*/
+      font-weight: 500;
+      /*redirect*/
+      color: #77ABD9;
+      /*redirect*/
+      padding: 1rem;
+      /*redirect*/
+      margin: 0;
+      /*redirect*/
+    }
+
+    [class*="col-"] {
+      float: initial;
+      padding: 10px;
+      align-items: center;
+      align-content: center;
+      position: relative;
+      /* border: 1px solid red; */
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .col-1 {
+      width: 8.33%;
+    }
+
+    .col-2 {
+      width: 16.66%;
+    }
+
+    .col-3 {
+      width: 23%;
+    }
+
+    svg {
+      width: 24pt;
+      height: 24pt;
+      fill-rule: evenodd;
+      clip-rule: evenodd;
+      stroke-linejoin: round;
+      stroke-miterlimit: 2;
+    }
+
+    .slider {
+      width: 100%;
+      text-align: center;
+      overflow: hidden;
+      position: absolute;
+      bottom: 16px;
+    }
+
+    .slides {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .slide {
+      scroll-snap-align: start;
+      flex-shrink: 0;
+      width: 100px;
+      height: 100px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-color: #fff;
+      margin-right: 10px;
+      border-radius: 10px;
+      border: none;
+      display: flex;
+    }
+
+    .slide.selected {
+      border: 2px solid #4285f4;
+    }
+
+    .slide:focus {
+      outline: none;
+    }
+
+    .slide:focus-visible {
+      outline: 1px solid #4285f4;
+    }
+  </style>
+
+  <script type="module">
+    const modelViewer = document.querySelector("#modelWindow");
+    const annotationClicked = (annotation) => {
+      let dataset = annotation.dataset;
+      modelViewer.cameraTarget = dataset.target;
+      modelViewer.cameraOrbit = dataset.orbit;
+      if (dataset.fov !== undefined)
+        modelViewer.fieldOfView = dataset.fov;
+    }
+
+    modelViewer.querySelectorAll('button').forEach((hotspot) => {
+      hotspot.addEventListener('click', () => annotationClicked(hotspot));
+    });
+  </script>
+  <script type="module">
+    const modelViewer = document.querySelector("#modelWindow");
+    const tapDistance = 2;
+    let panning = false;
+    let panX, panY;
+    let startX, startY;
+    let lastX, lastY;
+    let metersPerPixel;
+
+    const startPan = () => {
+      const orbit = modelViewer.getCameraOrbit();
+      console.log("orbit:" + orbit);
+      const { theta, phi, radius } = orbit;
+      const psi = theta - modelViewer.turntableRotation;
+      metersPerPixel = 0.75 * radius / modelViewer.getBoundingClientRect().height;
+      panX = [-Math.cos(psi), 0, Math.sin(psi)];
+      panY = [
+        -Math.cos(phi) * Math.sin(psi),
+        Math.sin(phi),
+        -Math.cos(phi) * Math.cos(psi)
+      ];
+      modelViewer.interactionPrompt = 'none';
+    };
+
+    const stopPan = (event) => {
+      panning = false;
+    }
+
+    const movePan = (thisX, thisY) => {
+      const dx = (thisX - lastX) * metersPerPixel;
+      const dy = (thisY - lastY) * metersPerPixel;
+      lastX = thisX;
+      lastY = thisY;
+
+      const target = modelViewer.getCameraTarget();
+      target.x += dx * panX[0] + dy * panY[0];
+      target.y += dx * panX[1] + dy * panY[1];
+      target.z += dx * panX[2] + dy * panY[2];
+      modelViewer.cameraTarget = `${target.x}m ${target.y}m ${target.z}m`;
+
+      // This pauses turntable rotation
+      modelViewer.dispatchEvent(new CustomEvent(
+        'camera-change', { detail: { source: 'user-interaction' } }));
+    };
+
+    const recenter = (pointer) => {
+      panning = false;
+      if (Math.abs(pointer.clientX - startX) > tapDistance ||
+        Math.abs(pointer.clientY - startY) > tapDistance)
+        return;
+      const hit = modelViewer.positionAndNormalFromPoint(pointer.clientX, pointer.clientY);
+      if (hit != null) {
+        modelViewer.cameraTarget = hit.position.toString();
+      }
+      else {
+        modelViewer.cameraTarget = 'auto auto auto';
+        modelViewer.cameraOrbit = 'auto auto auto';
+      }
+    };
+
+    modelViewer.addEventListener('mousedown', (event) => {
+      startX = event.clientX;
+      startY = event.clientY;
+      panning = event.button === 2 || event.ctrlKey || event.metaKey ||
+        event.shiftKey;
+      if (!panning)
+        return;
+
+      lastX = startX;
+      lastY = startY;
+      startPan();
+      event.stopPropagation();
+    }, true);
+
+    modelViewer.addEventListener('touchstart', (event) => {
+      const { targetTouches, touches } = event;
+      startX = targetTouches[0].clientX;
+      startY = targetTouches[0].clientY;
+      panning = targetTouches.length === 2 && targetTouches.length === touches.length;
+      if (!panning)
+        return;
+
+      lastX = 0.5 * (targetTouches[0].clientX + targetTouches[1].clientX);
+      lastY = 0.5 * (targetTouches[0].clientY + targetTouches[1].clientY);
+      startPan();
+    }, true);
+
+    self.addEventListener('mousemove', (event) => {
+      if (!panning)
+        return;
+
+      movePan(event.clientX, event.clientY);
+      event.stopPropagation();
+    }, true);
+
+    modelViewer.addEventListener('touchmove', (event) => {
+      if (!panning || event.targetTouches.length !== 2)
+        return;
+
+      const { targetTouches } = event;
+      const thisX = 0.5 * (targetTouches[0].clientX + targetTouches[1].clientX);
+      const thisY = 0.5 * (targetTouches[0].clientY + targetTouches[1].clientY);
+      movePan(thisX, thisY);
+    }, true);
+
+    let lastMousedown = { time: new Date().getTime() };
+    let lastTouchstart = { time: new Date().getTime() };
+    function doubletap(timer) {
+      var now = new Date().getTime();
+      var timesince = now - timer.time;
+      timer.time = new Date().getTime();
+      if ((timesince < 400) && (timesince > 0))
+        return true;
+      else
+        return false;
+    }
+
+    self.addEventListener('mouseup', (event) => {
+      stopPan(event);
+    }, true);
+
+    modelViewer.addEventListener('oncontextmenu', (event) => {
+      return false;
+    });
+
+    self.addEventListener('mousedown', (event) => {
+      if (doubletap(lastMousedown))
+        recenter(event);
+    }, true);
+
+    modelViewer.addEventListener('touchstart', (event) => {
+      if (doubletap(lastTouchstart) && event.targetTouches.length === 0) {
+        recenter(event.changedTouches[0]);
+
+        if (event.cancelable) {
+          event.preventDefault();
+        }
+      }
+    }, true);
+  </script>
+
+  <script>
+    function messageText(message, buttonPosition) {
+      alert(message);
+      increaseClickCounter(buttonPosition);
+    }
+    function increaseClickCounter(buttonPosition) {
+      var xmlHttp = new XMLHttpRequest();
+      xmlHttp.open("GET", "" + buttonPosition, true); // false for synchronous request
+      // xmlHttp.open("GET", "http://localhost:8080/customize?key=rapid-river-9192&dataType=increaseCounter&id="+buttonPosition, true); // false for synchronous request
+      xmlHttp.send(null);
+    }
+
+  </script>
+  <script>
+    animationNames = [];
+    animationLoops = [];
+    isOn = false;
+    let counter = 0;
+    function play_once() {
+      const modelViewer = document.querySelector('model-viewer');
+      //play to end or rewind if animation is at end//
+      modelViewer.play();
+      self.setTimeout(() => {
+        t = modelViewer.duration;
+        t = t * 1000;
+        setTimeout(stop, t);
+      }, 0.000001);
+    }
+    function play_times(times) {
+      const modelViewer = document.querySelector('model-viewer');
+      modelViewer.play();
+      if (times == 0)
+        return;
+      else play_once();
+    }
+    function play_half() {
+      //play to end or rewind if animation is at end//
+      const modelViewer = document.querySelector('model-viewer');
+      modelViewer.play();
+      t = modelViewer.duration;
+      t = t * 1000 / 2;
+      setTimeout(stop, t);
+    }
+    function playNextAnimationOnce() {
+      const modelViewer = document.querySelector('model-viewer');
+      if (animationNames.length === 0)
+        modelViewer.animationName = modelViewer.availableAnimations[counter % modelViewer.availableAnimations.length];
+      else {
+        let nextAnimation = animationNames[counter % animationNames.length];
+        modelViewer.animationName = nextAnimation;
+      }
+      counter++;
+      play_once();
+    }
+    function playNextAnimationLoop() {
+      const modelViewer = document.querySelector('model-viewer');
+      if (animationNames.length === 0)
+        modelViewer.animationName = modelViewer.availableAnimations[counter % modelViewer.availableAnimations.length];
+      else {
+        let nextAnimation = animationNames[counter % animationNames.length];
+        modelViewer.animationName = nextAnimation;
+      }
+      counter++;
+      modelViewer.play();
+    }
+    // for click trigger
+    function playNextAnimationTimes() {
+      const modelViewer = document.querySelector('model-viewer');
+      if (modelViewer.availableAnimations.length === 0) return;
+      if (animationNames.length === 0)
+        animationNames = modelViewer.availableAnimations;
+      if (animationNames.length != animationLoops.length) {
+        for (var i = 0; i < animationNames.length; i++) {
+          animationLoops.push(0);
+        }
+      }
+      let nextAnimation = animationNames[counter % animationNames.length];
+      modelViewer.animationName = nextAnimation;
+
+      if (animationLoops.length === 0)
+        modelViewer.play();
+      else {
+        play_times(animationLoops[counter % animationNames.length]);
+        // play_once();
+      }
+      counter++;
+    }
+    // for after trigger
+    function goThroughAnimations(fromLoop) {
+      const modelViewer = document.querySelector('model-viewer');
+      if (isOn && !fromLoop) {
+        isOn = false;
+        modelViewer.pause();
+        return;
+      }
+      else if (fromLoop && !isOn) return;
+      isOn = true;
+      if (modelViewer.availableAnimations.length === 0) return;
+      if (animationNames.length === 0)
+        animationNames = modelViewer.availableAnimations;
+
+      let nextAnimation = animationNames[counter % animationNames.length];
+      modelViewer.animationName = nextAnimation;
+      afterPlayer();
+    }
+    function afterPlayer() {
+      const modelViewer = document.querySelector('model-viewer');
+      //play to end or rewind if animation is at end//
+      if (isOn) modelViewer.play();
+      self.setTimeout(() => {
+        t = modelViewer.duration;
+        t = t * 1000;
+        setTimeout(() => {
+          stop();
+          counter++;
+          goThroughAnimations(true);
+        }, t);
+      }, 0.000001);
+    }
+    function playNextAnimation() {
+      const modelViewer = document.querySelector('model-viewer');
+      if (animationNames.length === 0)
+        modelViewer.animationName = modelViewer.availableAnimations[counter % modelViewer.availableAnimations.length];
+      else {
+        let nextAnimation = animationNames[counter % animationNames.length];
+        modelViewer.animationName = nextAnimation;
+      }
+      counter++;
+      modelViewer.play();
+    }
+    function stop() {
+      const modelViewer = document.querySelector('model-viewer');
+      modelViewer.pause();
+    }
+  </script>
+  <script type="module">
+    const modelViewer = document.querySelector("model-viewer");
+
+    window.switchSrc = (element, key, hologramStorageId, usdzStorageId, screenshotStorageId) => {
+      modelViewer.src = base + hologramStorageId;
+      modelViewer.iosSrc = base + usdzStorageId;
+      if (screenshotStorageId != null && screenshotStorageId != undefined && screenshotStorageId != "" && screenshotStorageId != 'null')
+        modelViewer.poster = base + screenshotStorageId;
+      else
+        modelViewer.poster = "ロゴいれう";
+      const slides = document.querySelectorAll(".slide");
+      slides.forEach((element) => { element.classList.remove("selected"); });
+      element.classList.add("selected");
+    };
+
+    if (document.querySelector(".slider") != null && document.querySelector(".slider") != undefined)
+      document.querySelector(".slider").addEventListener('beforexrselect', (ev) => {
+        // Keep slider interactions from affecting the XR scene.
+        ev.preventDefault();
+      });
+  </script>
+  
+</head>
+
+<body>
+  <div id="card">
+  </div>
+<model-viewer 
+style='width:100%;  height: 40rem; background-color: #77ABD9' 
+src='https://storage.echo3d.co/rapid-river-9192/17874088-e12b-44c5-8fc9-cba7a591ecb4.glb' 
+ios-src='https://storage.echo3d.co/rapid-river-9192/fac9785b-1d8f-47e6-9a81-7fb34963ddb5.usdz' 
+alt='rannnagisa' 
+poster='ロゴを見る' 
+background-color='#77ABD9' 
+quick-look-browsers='safari chrome' 
+camera-controls auto-rotate 
+autoplay ar ar-modes="webxr scene-viewer quick-look" onclick="playNextAnimationTimes()" 
+shadow-intensity='1' 
+shadowSoftness='1' 
+exposure='1'
+ ar-placement='floor' 
+ ar-scale='auto' 
+ loading='eager' 
+ min-camera-orbit='auto auto auto' 
+ max-camera-orbit='auto auto auto' 
+ id = "modelWindow">
+ <button 
+ class="arButton" 
+ slot='ar-button' 
+ style="right: 0.6rem; top:1rem;">ARで見る
+ </button>
+ <img src="ロゴを入れる" 
+ style="width: 5rem; position: absolute; bottom: 16px; right: 16px; ">
+ </a>
+ </model-viewer>
+ </body>
+ </html>
